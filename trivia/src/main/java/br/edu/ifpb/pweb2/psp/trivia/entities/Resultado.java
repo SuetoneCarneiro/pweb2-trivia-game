@@ -1,7 +1,7 @@
 package br.edu.ifpb.pweb2.psp.trivia.entities;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
-
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,12 +31,10 @@ public class Resultado {
 
     @ManyToOne
     @JoinColumn(name = "id_participante", referencedColumnName = "id")
-    @Column(name = "id_participante")
     private Participante idParticipante;
 
     @ManyToOne
     @JoinColumn(name = "id_corrida", referencedColumnName = "id")
-    @Column(name = "id_corrida")
-    private Long idCorrida;
+    private Corrida idCorrida;
 
 }
