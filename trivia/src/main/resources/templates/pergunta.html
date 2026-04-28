@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Respondendo Corrida</title>
+</head>
+<body>
+    <h2>Corrida: <span th:text="${corridaTitulo}">Título</span></h2>
+    <p>Pontuação atual: <span th:text="${pontuacao}">0</span></p>
+    <p>Tempo restante: <span id="timer">--</span> segundos</p>
+    
+    <form method="post" th:action="@{/corrida/responder}">
+        <fieldset>
+            <legend th:text="${pergunta.enunciado}">Enunciado da pergunta</legend>
+            <div th:each="alt, stat : ${pergunta.alternativas}">
+                <label>
+                    <input type="radio" name="alternativaEscolhida" th:value="${stat.index}" required />
+                    <span th:text="${alt}">Alternativa</span>
+                </label>
+            </div>
+        </fieldset>
+        <button type="submit">Responder e avançar</button>
+    </form>
+
+    <script>
+        // Simulação simples de timer – depois substituir por valor real do backend
+        let tempoRestante = <span th:text="${tempoRestante}">30</span>;
+        const timerSpan = document.getElementById('timer');
+        const intervalo = setInterval(() => {
+            if (tempoRestante <= 0) {
+                clearInterval(intervalo);
+                window.location.href = '/resultado?tempoEsgotado=true';
+            } else {
+                timerSpan.textContent = tempoRestante;
+                tempoRestante--;
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

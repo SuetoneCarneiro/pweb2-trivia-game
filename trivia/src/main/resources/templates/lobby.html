@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Trivia Game - Lobby</title>
+</head>
+<body>
+    <h1>Corridas Disponíveis</h1>
+    <div th:if="${corridas}">
+        <div th:each="corrida : ${corridas}" style="border:1px solid #ccc; margin:10px; padding:10px;">
+            <h3 th:text="${corrida.titulo}">Título</h3>
+            <p th:text="${corrida.descricao}">Descrição</p>
+            <p>Tempo: <span th:text="${corrida.tempo}">0</span> segundos</p>
+            <p>Perguntas: <span th:text="${corrida.perguntas.size()}">0</span></p>
+            <a th:href="@{/corrida/iniciar/{id}(id=${corrida.id})}">Participar</a>
+        </div>
+    </div>
+    <div th:unless="${corridas}">
+        <p>Nenhuma corrida ativa no momento.</p>
+    </div>
+    <hr />
+    <a th:href="@{/ranking}">Ver Ranking Geral</a><br/>
+    <a th:href="@{/logout}">Sair</a>
+    <div th:if="${mensagem}" th:text="${mensagem}" style="color:green;"></div>
+</body>
+</html>

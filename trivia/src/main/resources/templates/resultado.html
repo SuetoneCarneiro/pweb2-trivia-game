@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultado da Corrida</title>
+</head>
+<body>
+    <h1>Resultado Final</h1>
+    <p>Corrida: <span th:text="${corridaTitulo}">Título</span></p>
+    <p>Sua pontuação: <strong th:text="${pontuacao}">0</strong> pontos</p>
+    <div th:if="${mensagem}" th:text="${mensagem}" style="color:blue;"></div>
+    <hr />
+    <a th:href="@{/lobby}">Voltar ao Lobby</a><br/>
+    <a th:href="@{/ranking}">Ver Ranking</a><br/>
+    <a th:href="@{/logout}">Sair</a>
+</body>
+</html>

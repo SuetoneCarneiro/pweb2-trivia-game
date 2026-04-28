@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Ranking Geral</title>
+</head>
+<body>
+    <h1>Ranking Geral</h1>
+    <table border="1" cellpadding="8">
+        <thead>
+            <tr>
+                <th>Posição</th>
+                <th>Participante</th>
+                <th>Corrida</th>
+                <th>Pontuação</th>
+                <th>Data/Hora</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="resultado, estat : ${resultados}">
+                <td th:text="${estat.index + 1}">1</td>
+                <td th:text="${resultado.idParticipante.nome}">Nome</td>
+                <td th:text="${resultado.idCorrida.titulo}">Corrida</td>
+                <td th:text="${resultado.pontuacao}">0</td>
+                <td th:text="${#temporals.format(resultado.dataHora, 'dd/MM/yyyy HH:mm')}">Data</td>
+            </tr>
+            <tr th:if="${resultados == null or resultados.empty}">
+                <td colspan="5">Nenhum resultado registrado ainda.</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr />
+    <a th:href="@{/lobby}">Voltar ao Lobby</a><br/>
+    <a th:href="@{/logout}">Sair</a>
+</body>
+</html>
