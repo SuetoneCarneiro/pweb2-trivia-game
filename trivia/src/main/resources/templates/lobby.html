@@ -2,25 +2,72 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Trivia Game - Lobby</title>
 </head>
-<body>
-    <h1>Corridas Disponíveis</h1>
-    <div th:if="${corridas}">
-        <div th:each="corrida : ${corridas}" style="border:1px solid #ccc; margin:10px; padding:10px;">
-            <h3 th:text="${corrida.titulo}">Título</h3>
-            <p th:text="${corrida.descricao}">Descrição</p>
-            <p>Tempo: <span th:text="${corrida.tempo}">0</span> segundos</p>
-            <p>Perguntas: <span th:text="${corrida.perguntas.size()}">0</span></p>
-            <a th:href="@{/corrida/iniciar/{id}(id=${corrida.id})}">Participar</a>
+<body class="min-h-screen bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
+            <div class="flex items-center gap-4">
+                <a th:href="@{/ranking}"
+                   class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">
+                    Ranking
+                </a>
+                <a th:href="@{/logout}"
+                   class="text-sm font-medium text-red-500 hover:text-red-700 transition">
+                    Sair
+                </a>
+            </div>
         </div>
-    </div>
-    <div th:unless="${corridas}">
-        <p>Nenhuma corrida ativa no momento.</p>
-    </div>
-    <hr />
-    <a th:href="@{/ranking}">Ver Ranking Geral</a><br/>
-    <a th:href="@{/logout}">Sair</a>
-    <div th:if="${mensagem}" th:text="${mensagem}" style="color:green;"></div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-800">Corridas Disponíveis</h2>
+            <p class="mt-1 text-gray-500">Escolha uma corrida para participar</p>
+        </div>
+
+        <div th:if="${mensagem}"
+             class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm"
+             th:text="${mensagem}"></div>
+
+        <!-- Grid de corridas -->
+        <div th:if="${corridas}" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div th:each="corrida : ${corridas}"
+                 class="bg-white rounded-2xl shadow-md hover:shadow-xl border border-gray-100 transition-all duration-200 flex flex-col">
+                <div class="p-6 flex-1">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2" th:text="${corrida.titulo}">Título</h3>
+                    <p class="text-gray-500 text-sm mb-4 leading-relaxed" th:text="${corrida.descricao}">Descrição</p>
+                    <div class="flex items-center gap-4 text-xs text-gray-400">
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                            <span th:text="${corrida.tempo} + 's'">0s</span>
+                        </span>
+                        <span class="flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                            <span th:text="${corrida.perguntas.size()} + ' perguntas'">0 perguntas</span>
+                        </span>
+                    </div>
+                </div>
+                <div class="px-6 pb-6">
+                    <a th:href="@{/corrida/iniciar/{id}(id=${corrida.id})}"
+                       class="block w-full text-center py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-colors duration-200">
+                        Participar
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Estado vazio -->
+        <div th:unless="${corridas}" class="text-center py-20">
+            <svg class="mx-auto w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>
+            <p class="text-gray-400 text-lg">Nenhuma corrida ativa no momento.</p>
+        </div>
+    </main>
+
 </body>
 </html>

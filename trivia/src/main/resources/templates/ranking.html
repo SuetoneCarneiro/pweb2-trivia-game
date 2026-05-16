@@ -2,35 +2,75 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Ranking Geral</title>
 </head>
-<body>
-    <h1>Ranking Geral</h1>
-    <table border="1" cellpadding="8">
-        <thead>
-            <tr>
-                <th>Posição</th>
-                <th>Participante</th>
-                <th>Corrida</th>
-                <th>Pontuação</th>
-                <th>Data/Hora</th>
-            </tr>
-        </thead>
-        <tbody>
-            <tr th:each="resultado, estat : ${resultados}">
-                <td th:text="${estat.index + 1}">1</td>
-                <td th:text="${resultado.idParticipante.nome}">Nome</td>
-                <td th:text="${resultado.idCorrida.titulo}">Corrida</td>
-                <td th:text="${resultado.pontuacao}">0</td>
-                <td th:text="${#temporals.format(resultado.dataHora, 'dd/MM/yyyy HH:mm')}">Data</td>
-            </tr>
-            <tr th:if="${resultados == null or resultados.empty}">
-                <td colspan="5">Nenhum resultado registrado ainda.</td>
-            </tr>
-        </tbody>
-    </table>
-    <hr />
-    <a th:href="@{/lobby}">Voltar ao Lobby</a><br/>
-    <a th:href="@{/logout}">Sair</a>
+<body class="min-h-screen bg-gray-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
+            <div class="flex items-center gap-4">
+                <a th:href="@{/lobby}"
+                   class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">
+                    Lobby
+                </a>
+                <a th:href="@{/logout}"
+                   class="text-sm font-medium text-red-500 hover:text-red-700 transition">
+                    Sair
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div class="mb-8">
+            <h2 class="text-3xl font-extrabold text-gray-800">Ranking Geral</h2>
+            <p class="mt-1 text-gray-500">Os melhores resultados de todas as corridas</p>
+        </div>
+
+        <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-indigo-600 text-white text-sm uppercase tracking-wider">
+                            <th class="px-6 py-4 font-semibold">#</th>
+                            <th class="px-6 py-4 font-semibold">Participante</th>
+                            <th class="px-6 py-4 font-semibold">Corrida</th>
+                            <th class="px-6 py-4 font-semibold text-center">Pontuação</th>
+                            <th class="px-6 py-4 font-semibold">Data/Hora</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr th:each="resultado, estat : ${resultados}"
+                            class="hover:bg-indigo-50/50 transition-colors duration-150"
+                            th:classappend="${estat.index % 2 == 0} ? 'bg-white' : 'bg-gray-50/50'">
+                            <td class="px-6 py-4">
+                                <span th:if="${estat.index == 0}" class="inline-flex items-center justify-center w-8 h-8 bg-yellow-100 text-yellow-700 font-bold rounded-full text-sm">1</span>
+                                <span th:if="${estat.index == 1}" class="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 font-bold rounded-full text-sm">2</span>
+                                <span th:if="${estat.index == 2}" class="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-700 font-bold rounded-full text-sm">3</span>
+                                <span th:if="${estat.index > 2}" class="text-gray-400 font-medium pl-2" th:text="${estat.index + 1}">4</span>
+                            </td>
+                            <td class="px-6 py-4 font-medium text-gray-800" th:text="${resultado.idParticipante.nome}">Nome</td>
+                            <td class="px-6 py-4 text-gray-500" th:text="${resultado.idCorrida.titulo}">Corrida</td>
+                            <td class="px-6 py-4 text-center">
+                                <span class="inline-block bg-indigo-100 text-indigo-700 font-bold text-sm px-3 py-1 rounded-full"
+                                      th:text="${resultado.pontuacao}">0</span>
+                            </td>
+                            <td class="px-6 py-4 text-gray-400 text-sm" th:text="${#temporals.format(resultado.dataHora, 'dd/MM/yyyy HH:mm')}">Data</td>
+                        </tr>
+                        <tr th:if="${resultados == null or resultados.empty}">
+                            <td colspan="5" class="px-6 py-12 text-center text-gray-400">
+                                Nenhum resultado registrado ainda.
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
 </body>
 </html>

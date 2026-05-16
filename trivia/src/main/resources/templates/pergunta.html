@@ -2,39 +2,100 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <title>Respondendo Corrida</title>
+    <style type="text/tailwindcss">
+        @theme {
+            --color-timer-bar: #6366f1;
+        }
+    </style>
 </head>
-<body>
-    <h2>Corrida: <span th:text="${corridaTitulo}">Título</span></h2>
-    <p>Pontuação atual: <span th:text="${pontuacao}">0</span></p>
-    <p>Tempo restante: <span id="timer">--</span> segundos</p>
-    
-    <form method="post" th:action="@{/corrida/responder}">
-        <fieldset>
-            <legend th:text="${pergunta.enunciado}">Enunciado da pergunta</legend>
-            <div th:each="alt, stat : ${pergunta.alternativas}">
-                <label>
-                    <input type="radio" name="alternativaEscolhida" th:value="${stat.index}" required />
-                    <span th:text="${alt}">Alternativa</span>
-                </label>
-            </div>
-        </fieldset>
-        <button type="submit">Responder e avançar</button>
-    </form>
+<body class="min-h-screen bg-gradient-to-br from-slate-100 to-indigo-50">
 
-    <script>
-        // Simulação simples de timer – depois substituir por valor real do backend
-        let tempoRestante = <span th:text="${tempoRestante}">30</span>;
+    <!-- Top bar -->
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-indigo-700 truncate" th:text="${corridaTitulo}">Título</h2>
+            <div class="flex items-center gap-4">
+                <span class="text-sm font-semibold text-gray-600">
+                    Pontos: <span class="text-indigo-600" th:text="${pontuacao}">0</span>
+                </span>
+                <span class="flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full"
+                      id="timer-badge">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    <span id="timer">--</span>s
+                </span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Timer progress bar -->
+    <div class="max-w-3xl mx-auto px-4 mt-4">
+        <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div id="timer-bar" class="h-full bg-indigo-500 rounded-full transition-all duration-1000 ease-linear" style="width:100%"></div>
+        </div>
+    </div>
+
+    <!-- Question card -->
+    <main class="max-w-3xl mx-auto px-4 py-8">
+        <form method="post" th:action="@{/corrida/responder}">
+            <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-indigo-600 px-6 py-4">
+                    <p class="text-white text-lg font-semibold leading-relaxed" th:text="${pergunta.enunciado}">Enunciado da pergunta</p>
+                </div>
+
+                <div class="p-6 space-y-3">
+                    <div th:each="alt, stat : ${pergunta.alternativas}">
+                        <label class="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-100 hover:border-indigo-300 hover:bg-indigo-50/50 cursor-pointer transition-all duration-150 has-checked:border-indigo-500 has-checked:bg-indigo-50">
+                            <input type="radio" name="alternativaEscolhida" th:value="${stat.index}" required
+                                   class="w-5 h-5 text-indigo-600 accent-indigo-600" />
+                            <span class="text-gray-700" th:text="${alt}">Alternativa</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="px-6 pb-6">
+                    <button type="submit"
+                            class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200 cursor-pointer">
+                        Responder e avançar
+                    </button>
+                </div>
+            </div>
+        </form>
+    </main>
+
+    <script th:inline="javascript">
+        let tempoRestante = /*[[${tempoRestante}]]*/ 30;
+        const tempoTotal = tempoRestante;
         const timerSpan = document.getElementById('timer');
+        const timerBar = document.getElementById('timer-bar');
+        const timerBadge = document.getElementById('timer-badge');
+
+        timerSpan.textContent = tempoRestante;
+        timerBadge.classList.add('bg-indigo-100', 'text-indigo-700');
+
         const intervalo = setInterval(() => {
             if (tempoRestante <= 0) {
                 clearInterval(intervalo);
                 window.location.href = '/resultado?tempoEsgotado=true';
             } else {
-                timerSpan.textContent = tempoRestante;
                 tempoRestante--;
+                timerSpan.textContent = tempoRestante;
+                timerBar.style.width = ((tempoRestante / tempoTotal) * 100) + '%';
+
+                if (tempoRestante <= 10) {
+                    timerBar.classList.replace('bg-indigo-500', 'bg-red-500');
+                    timerBadge.classList.remove('bg-indigo-100', 'text-indigo-700');
+                    timerBadge.classList.add('bg-red-100', 'text-red-700');
+                } else if (tempoRestante <= 20) {
+                    timerBar.classList.replace('bg-indigo-500', 'bg-amber-500');
+                    timerBadge.classList.remove('bg-indigo-100', 'text-indigo-700');
+                    timerBadge.classList.add('bg-amber-100', 'text-amber-700');
+                }
             }
         }, 1000);
     </script>
+
 </body>
 </html>
