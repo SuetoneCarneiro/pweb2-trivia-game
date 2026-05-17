@@ -25,6 +25,10 @@ public class ParticipanteService {
         return participanteRepository.save(novo);
     }
 
+    public Optional<Participante> buscarPorNome(String nome) {
+        return participanteRepository.findByNomeIgnoreCase(nome);
+    }
+
     public Participante buscarPorId(Long id) {
         return participanteRepository.findById(id).orElse(null);
     }
