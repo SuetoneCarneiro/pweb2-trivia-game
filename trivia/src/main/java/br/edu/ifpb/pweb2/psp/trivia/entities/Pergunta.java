@@ -28,8 +28,9 @@ public class Pergunta {
     @Column(name = "enunciado")
     private String enunciado;
 
+    //(pedroA) alterei o tipo para Integer para armazenar o índice da alternativa correta
     @Column(name = "resposta")
-    private String resposta;
+    private Integer resposta;
 
     @ManyToOne
     @JoinColumn(name = "id_corrida", referencedColumnName = "id")

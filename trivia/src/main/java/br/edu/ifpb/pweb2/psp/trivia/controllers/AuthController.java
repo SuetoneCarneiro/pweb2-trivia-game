@@ -1,9 +1,7 @@
 package br.edu.ifpb.pweb2.psp.trivia.controllers;
 
 import java.util.List;
-
 import jakarta.servlet.http.HttpSession;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import br.edu.ifpb.pweb2.psp.trivia.entities.Corrida;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Participante;
 import br.edu.ifpb.pweb2.psp.trivia.services.CorridaService;
@@ -30,6 +27,9 @@ public class AuthController {
     public String index(HttpSession session) {
         Participante participante = (Participante) session.getAttribute("participanteLogado");
         if (participante != null) {
+            if (Boolean.TRUE.equals(participante.getAdm())) {
+                return "redirect:/admin/dashboard";
+            }
             return "redirect:/lobby";
         }
         return "redirect:/login";
@@ -47,8 +47,13 @@ public class AuthController {
             return "redirect:/login";
         }
 
+        //para verificar se o usuário é admin e jogar ele pro dashboard do adm 
         Participante participante = participanteService.buscarOuCriar(nome.trim());
         session.setAttribute("participanteLogado", participante);
+
+        if (Boolean.TRUE.equals(participante.getAdm())) {
+            return "redirect:/admin/dashboard";
+        }
         return "redirect:/lobby";
     }
 

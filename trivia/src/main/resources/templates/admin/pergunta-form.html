@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Nova Pergunta</title>
+</head>
+<body class="bg-gray-50">
+
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
+            <a th:href="@{/admin/perguntas/{id}(id=${corrida.id})}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">← Voltar para perguntas</a>
+        </div>
+    </header>
+
+    <div class="max-w-4xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-4">Nova Pergunta</h1>
+            <p class="text-gray-600 mb-6">Corrida: <strong th:text="${corrida.titulo}"></strong></p>
+
+            <form method="post" th:action="@{/admin/perguntas/salvar}" th:object="${pergunta}">
+                <input type="hidden" th:field="*{idCorrida.id}" />
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Enunciado da pergunta</label>
+                    <textarea th:field="*{enunciado}" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2" required></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Alternativas (separadas por ponto e vírgula ;)</label>
+                    <input type="text" name="alternativasList" id="alternativasList" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Exemplo: 10;20;30;40;50" required />
+                    <p class="text-xs text-gray-400 mt-1">Digite as opções separadas por ; (ex: Azul;Verde;Amarelo;Vermelho)</p>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-gray-700 font-medium mb-2">Índice da resposta correta (0‑based)</label>
+                    <input type="number" name="indiceResposta" id="indiceResposta" min="0" step="1" class="w-32 border border-gray-300 rounded-lg px-4 py-2" required />
+                    <p class="text-xs text-gray-400 mt-1">Exemplo: se a resposta correta for a primeira alternativa, digite 0. Se for a segunda, digite 1, etc.</p>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <a th:href="@{/admin/perguntas/{id}(id=${corrida.id})}" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</a>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">Salvar Pergunta</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>

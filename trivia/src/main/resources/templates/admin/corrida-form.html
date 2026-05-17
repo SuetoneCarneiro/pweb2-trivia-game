@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>Formulário de Corrida</title>
+</head>
+<body class="bg-gray-50">
+
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
+            <a href="/admin/dashboard" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">← Voltar</a>
+        </div>
+    </header>
+
+    <div class="max-w-3xl mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg p-6">
+            <h1 class="text-2xl font-bold text-gray-800 mb-6" th:text="${corrida.id == null} ? 'Nova Corrida' : 'Editar Corrida'"></h1>
+
+            <form method="post" th:action="@{/admin/corridas/salvar}" th:object="${corrida}">
+                <input type="hidden" th:field="*{id}" />
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Título</label>
+                    <input type="text" th:field="*{titulo}" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-indigo-400" required />
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Descrição</label>
+                    <textarea th:field="*{descricao}" rows="3" class="w-full border border-gray-300 rounded-lg px-4 py-2"></textarea>
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-gray-700 font-medium mb-2">Tempo limite (segundos)</label>
+                    <input type="number" th:field="*{tempo}" class="w-full border border-gray-300 rounded-lg px-4 py-2" required />
+                </div>
+
+                <div class="mb-6">
+                    <label class="inline-flex items-center">
+                        <input type="checkbox" th:field="*{ativo}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" />
+                        <span class="ml-2 text-gray-700">Corrida ativa (visível no lobby)</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end gap-3">
+                    <a href="/admin/dashboard" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">Cancelar</a>
+                    <button type="submit" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</body>
+</html>
