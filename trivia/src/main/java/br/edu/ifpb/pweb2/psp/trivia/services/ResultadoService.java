@@ -1,8 +1,10 @@
 package br.edu.ifpb.pweb2.psp.trivia.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.List;
+
 import br.edu.ifpb.pweb2.psp.trivia.entities.Resultado;
 import br.edu.ifpb.pweb2.psp.trivia.repositories.ResultadoRepository;
 
@@ -30,5 +32,9 @@ public class ResultadoService {
                 .filter(r -> r.getIdCorrida() != null && r.getIdCorrida().getId().equals(idCorrida))
                 .sorted((r1, r2) -> r2.getPontuacao().compareTo(r1.getPontuacao()))
                 .toList();
+    }
+
+    public List<Resultado> listarPorParticipante(Long idParticipante) {
+        return resultadoRepository.findByIdParticipanteId(idParticipante);
     }
 }

@@ -64,6 +64,7 @@ public class CorridaController {
         session.setAttribute(SESSAO_INDICE, 0);
         session.setAttribute(SESSAO_PONTUACAO, BigDecimal.ZERO);
         session.setAttribute(SESSAO_INICIO, System.currentTimeMillis());
+        session.setAttribute("dataHoraInicio", LocalDateTime.now());
 
         return "redirect:/corrida/pergunta";
     }
@@ -152,6 +153,8 @@ public class CorridaController {
         Long corridaId = (Long) session.getAttribute(SESSAO_CORRIDA_ID);
         BigDecimal pontuacao = (BigDecimal) session.getAttribute("pontuacao");
         Participante participante = (Participante) session.getAttribute("participanteLogado");
+        LocalDateTime dataHoraInicio = (LocalDateTime) session.getAttribute("dataHoraInicio");
+      
 
         if (corridaId != null && participante != null && pontuacao != null) {
             Corrida corrida = corridaService.buscarPorId(corridaId);
@@ -160,15 +163,17 @@ public class CorridaController {
             resultado.setDataHora(LocalDateTime.now());
             resultado.setIdParticipante(participante);
             resultado.setIdCorrida(corrida);
+            resultado.setDataHora(dataHoraInicio != null ? dataHoraInicio : LocalDateTime.now());
             resultadoService.salvar(resultado);
+        
             redirectAttributes.addFlashAttribute("mensagem", "Parabéns! Você marcou " + pontuacao + " pontos!");
             session.setAttribute("ultimoCorridaTitulo", corrida.getTitulo());
+          
         }
 
         session.removeAttribute(SESSAO_CORRIDA_ID);
         session.removeAttribute(SESSAO_PERGUNTAS);
         session.removeAttribute(SESSAO_INDICE);
-        // session.removeAttribute(SESSAO_PONTUACAO);
         session.removeAttribute(SESSAO_INICIO);
     }
 }
