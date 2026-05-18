@@ -27,12 +27,12 @@ public class RankingController {
         }
         BigDecimal pontuacao = (BigDecimal) session.getAttribute("pontuacao");
     String corridaTitulo = (String) session.getAttribute("ultimoCorridaTitulo");
-
   
     model.addAttribute("pontuacao", pontuacao != null ? pontuacao : BigDecimal.ZERO);
     model.addAttribute("corridaTitulo", corridaTitulo != null ? corridaTitulo : "Última corrida");
     session.removeAttribute("pontuacao");
     session.removeAttribute("ultimoCorridaTitulo");
+
         return "resultado";
     }
 
