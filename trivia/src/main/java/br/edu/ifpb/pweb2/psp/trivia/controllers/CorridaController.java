@@ -3,15 +3,16 @@ package br.edu.ifpb.pweb2.psp.trivia.controllers;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
-import jakarta.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.ui.Model;
+
 import br.edu.ifpb.pweb2.psp.trivia.entities.Corrida;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Participante;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Pergunta;
@@ -19,6 +20,7 @@ import br.edu.ifpb.pweb2.psp.trivia.entities.Resultado;
 import br.edu.ifpb.pweb2.psp.trivia.services.CorridaService;
 import br.edu.ifpb.pweb2.psp.trivia.services.PerguntaService;
 import br.edu.ifpb.pweb2.psp.trivia.services.ResultadoService;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
 public class CorridaController {
@@ -148,7 +150,7 @@ public class CorridaController {
 
     private void finalizarCorrida(HttpSession session, RedirectAttributes redirectAttributes) {
         Long corridaId = (Long) session.getAttribute(SESSAO_CORRIDA_ID);
-        BigDecimal pontuacao = (BigDecimal) session.getAttribute(SESSAO_PONTUACAO);
+        BigDecimal pontuacao = (BigDecimal) session.getAttribute("pontuacao");
         Participante participante = (Participante) session.getAttribute("participanteLogado");
 
         if (corridaId != null && participante != null && pontuacao != null) {
@@ -160,12 +162,13 @@ public class CorridaController {
             resultado.setIdCorrida(corrida);
             resultadoService.salvar(resultado);
             redirectAttributes.addFlashAttribute("mensagem", "Parabéns! Você marcou " + pontuacao + " pontos!");
+            session.setAttribute("ultimoCorridaTitulo", corrida.getTitulo());
         }
 
         session.removeAttribute(SESSAO_CORRIDA_ID);
         session.removeAttribute(SESSAO_PERGUNTAS);
         session.removeAttribute(SESSAO_INDICE);
-        session.removeAttribute(SESSAO_PONTUACAO);
+        // session.removeAttribute(SESSAO_PONTUACAO);
         session.removeAttribute(SESSAO_INICIO);
     }
 }
