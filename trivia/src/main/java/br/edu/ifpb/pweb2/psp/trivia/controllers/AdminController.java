@@ -79,10 +79,32 @@ public class AdminController {
             ra.addFlashAttribute("mensagem", "Acesso negado.");
             return "redirect:/lobby";
         }
+        boolean novaCorrida = (corrida.getId() == null);
         if (corrida.getAtivo() == null) corrida.setAtivo(false);
         corridaService.salvar(corrida);
-        ra.addFlashAttribute("mensagem", "Corrida salva com sucesso!");
+
+        if (novaCorrida) {
+            ra.addFlashAttribute("mensagem", "Corrida criada com sucesso!");
+            return "redirect:/admin/corridas/" + corrida.getId() + "/confirmar-perguntas";
+        }
+
+        ra.addFlashAttribute("mensagem", "Corrida atualizada com sucesso!");
         return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/corridas/{id}/confirmar-perguntas")
+    public String confirmarPerguntas(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
+        if (!isAdmin(session)) {
+            ra.addFlashAttribute("mensagem", "Acesso negado.");
+            return "redirect:/lobby";
+        }
+        Corrida corrida = corridaService.buscarPorId(id);
+        if (corrida == null) {
+            ra.addFlashAttribute("mensagem", "Corrida não encontrada.");
+            return "redirect:/admin/dashboard";
+        }
+        model.addAttribute("corrida", corrida);
+        return "admin/confirmar-perguntas";
     }
 
     @GetMapping("/corridas/excluir/{id}")
