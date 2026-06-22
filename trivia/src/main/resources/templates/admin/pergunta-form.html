@@ -1,18 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Nova Pergunta</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Nova Pergunta')}"></head>
 <body class="bg-gray-50">
 
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
-            <a th:href="@{/admin/perguntas/{id}(id=${corrida.id})}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">← Voltar para perguntas</a>
-        </div>
+    <header th:replace="~{fragments/layout :: header-admin(~{:: #pergunta-form-nav})}">
+        <th:block id="pergunta-form-nav">
+            <a th:href="@{/admin/perguntas/{id}(id=${corrida.id})}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">&larr; Voltar para perguntas</a>
+        </th:block>
     </header>
 
     <div class="max-w-4xl mx-auto px-4 py-8">
