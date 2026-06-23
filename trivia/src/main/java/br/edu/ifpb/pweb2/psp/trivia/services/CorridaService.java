@@ -32,4 +32,24 @@ public class CorridaService {
     public void excluir(Long id) {
         corridaRepository.deleteById(id);
     }
+
+    // Soft delete - apenas desativa a corrida em vez de removê-la do banco. A corrida não aparece mais no lobby
+    public Corrida desativar(Long id) {
+        Corrida corrida = buscarPorId(id);
+        if (corrida == null) {
+            return null;
+        }
+        corrida.setAtivo(false);
+        return corridaRepository.save(corrida);
+    }
+
+    // Reativa uma corrida desativada, tornando-a visível novamente no lobby.
+    public Corrida reativar(Long id) {
+        Corrida corrida = buscarPorId(id);
+        if (corrida == null) {
+            return null;
+        }
+        corrida.setAtivo(true);
+        return corridaRepository.save(corrida);
+    }
 }
