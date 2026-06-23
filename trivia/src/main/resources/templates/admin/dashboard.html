@@ -35,7 +35,8 @@
                         <a th:href="@{/admin/perguntas/{id}(id=${c.id})}" class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg hover:bg-indigo-100">Perguntas</a>
                         <a th:href="@{/admin/corridas/editar/{id}(id=${c.id})}" class="text-sm bg-amber-50 text-amber-600 px-3 py-1 rounded-lg hover:bg-amber-100">Editar</a>
                         <a th:href="@{/admin/participantes/{id}(id=${c.id})}" class="text-sm bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg hover:bg-emerald-100">Participantes</a>
-                        <a th:href="@{/admin/corridas/excluir/{id}(id=${c.id})}" onclick="return confirm('Excluir esta corrida?')" class="text-sm bg-red-50 text-red-600 px-3 py-1 rounded-lg hover:bg-red-100">Excluir</a>
+                        <a th:if="${c.ativo}" th:href="@{/admin/corridas/desativar/{id}(id=${c.id})}" onclick="return confirm('Desativar esta corrida?')" class="text-sm bg-red-50 text-red-600 px-3 py-1 rounded-lg hover:bg-red-100">Desativar</a>
+                        <a th:unless="${c.ativo}" th:href="@{/admin/corridas/reativar/{id}(id=${c.id})}" onclick="return confirm('Reativar esta corrida?')" class="text-sm bg-green-50 text-green-600 px-3 py-1 rounded-lg hover:bg-green-100">Reativar</a>
                     </div>
                 </div>
             </div>
