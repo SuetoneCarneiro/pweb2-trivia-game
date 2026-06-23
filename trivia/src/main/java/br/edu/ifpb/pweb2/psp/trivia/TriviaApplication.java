@@ -3,14 +3,17 @@ package br.edu.ifpb.pweb2.psp.trivia;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.edu.ifpb.pweb2.psp.trivia.entities.Corrida;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Participante;
+import br.edu.ifpb.pweb2.psp.trivia.entities.Perfil;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Pergunta;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Resultado;
 import br.edu.ifpb.pweb2.psp.trivia.repositories.CorridaRepository;
@@ -27,19 +30,23 @@ public class TriviaApplication {
     @Bean
     public CommandLineRunner inicializarDados(ParticipanteRepository participanteRepo,
                                               CorridaRepository corridaRepo,
-                                              ResultadoRepository resultadoRepo) {
+                                              ResultadoRepository resultadoRepo,
+                                              PasswordEncoder passwordEncoder) {
         return args -> {
             if (participanteRepo.count() > 0) return;
 
+            // Senha padrão (em texto puro: "123456") para todos os usuários de teste.
+            String senhaPadrao = passwordEncoder.encode("123456");
+
             // --- Participantes ---
-            criarParticipante(participanteRepo, "Pedro Lucas", "pepe@gmail.com", true);
-            criarParticipante(participanteRepo, "Suetone", "suetone@gmail.com", true);
-            criarParticipante(participanteRepo, "Pedro Arthur", "pedroanery@gmail.com", true);
-            Participante fred = criarParticipante(participanteRepo, "Fred", "fred@gmail.com", false);
-            Participante ana = criarParticipante(participanteRepo, "Ana Clara", "anaclara@gmail.com", false);
-            Participante carlos = criarParticipante(participanteRepo, "Carlos", "carlos44@gmail.com", false);
-            Participante mariana = criarParticipante(participanteRepo, "Mariana", "mariana@gmail.com", false);
-            Participante nabu = criarParticipante(participanteRepo, "Nabucodonosor", "nabuquinho08@gmail.com", false);
+            criarParticipante(participanteRepo, "Pedro Lucas", "pepe@gmail.com", true, senhaPadrao);
+            criarParticipante(participanteRepo, "Suetone", "suetone@gmail.com", true, senhaPadrao);
+            criarParticipante(participanteRepo, "Pedro Arthur", "pedroanery@gmail.com", true, senhaPadrao);
+            Participante fred = criarParticipante(participanteRepo, "Fred", "fred@gmail.com", false, senhaPadrao);
+            Participante ana = criarParticipante(participanteRepo, "Ana Clara", "anaclara@gmail.com", false, senhaPadrao);
+            Participante carlos = criarParticipante(participanteRepo, "Carlos", "carlos44@gmail.com", false, senhaPadrao);
+            Participante mariana = criarParticipante(participanteRepo, "Mariana", "mariana@gmail.com", false, senhaPadrao);
+            Participante nabu = criarParticipante(participanteRepo, "Nabucodonosor", "nabuquinho08@gmail.com", false, senhaPadrao);
 
             System.out.println(">>> Participantes criados: " + participanteRepo.count());
 
@@ -108,11 +115,13 @@ public class TriviaApplication {
         };
     }
 
-    private Participante criarParticipante(ParticipanteRepository repo, String nome, String email, boolean adm) {
+    private Participante criarParticipante(ParticipanteRepository repo, String nome, String email,
+                                           boolean adm, String senhaCriptografada) {
         Participante p = new Participante();
         p.setNome(nome);
         p.setEmail(email);
-        p.setAdm(adm);
+        p.setSenha(senhaCriptografada);
+        p.setPerfis(adm ? Set.of(Perfil.ADMIN) : Set.of(Perfil.PARTICIPANTE));
         return repo.save(p);
     }
 
