@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Erro inesperado')}"></head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600 flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center">
+
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-amber-100 rounded-full mb-5">
+                <svg class="w-8 h-8 text-amber-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                </svg>
+            </div>
+
+            <p class="text-6xl font-extrabold text-amber-600 mb-2" th:text="${status} ?: 'Ops'">Ops</p>
+            <h1 class="text-2xl font-extrabold text-gray-800 mb-2">Erro inesperado</h1>
+            <p class="text-gray-500 mb-8">Algo deu errado ao processar sua solicitação. Tente novamente mais tarde.</p>
+
+            <a th:href="@{/lobby}"
+               class="block w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+                Voltar ao início
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
