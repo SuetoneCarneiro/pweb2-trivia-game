@@ -1,21 +1,17 @@
 package br.edu.ifpb.pweb2.psp.trivia.controllers;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import br.edu.ifpb.pweb2.psp.trivia.entities.Corrida;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Participante;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Resultado;
 import br.edu.ifpb.pweb2.psp.trivia.services.CorridaService;
-import br.edu.ifpb.pweb2.psp.trivia.services.ParticipanteService;
 import br.edu.ifpb.pweb2.psp.trivia.services.ResultadoService;
 import jakarta.servlet.http.HttpSession;
 
@@ -23,51 +19,25 @@ import jakarta.servlet.http.HttpSession;
 public class AuthController {
 
     @Autowired
-    private ParticipanteService participanteService;
-
-    @Autowired
     private CorridaService corridaService;
 
     @Autowired
     private ResultadoService resultadoService;
 
+    // Autenticação (POST /login) e logout são tratados pelo Spring Security.
     @GetMapping("/")
-    public String index(HttpSession session) {
-        Participante participante = (Participante) session.getAttribute("participanteLogado");
-        if (participante != null) {
-            if (Boolean.TRUE.equals(participante.getAdm())) {
-                return "redirect:/admin/dashboard";
-            }
-            return "redirect:/lobby";
+    public String index(Authentication authentication) {
+        if (authentication == null) {
+            return "redirect:/login";
         }
-        return "redirect:/login";
+        boolean admin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        return admin ? "redirect:/admin/dashboard" : "redirect:/lobby";
     }
 
     @GetMapping("/login")
     public String loginPage() {
         return "login";
-    }
-
-    @PostMapping("/login")
-    public String login(@RequestParam String nome, HttpSession session, RedirectAttributes redirectAttributes) {
-        if (nome == null || nome.trim().isEmpty()) {
-            redirectAttributes.addFlashAttribute("mensagem", "Por favor, informe seu nome.");
-            return "redirect:/login";
-        }
-
-        Optional<Participante> resultado = participanteService.buscarPorNome(nome.trim());
-        if (resultado.isEmpty()) {
-            redirectAttributes.addFlashAttribute("mensagem", "Usuário não encontrado. Verifique o nome e tente novamente.");
-            return "redirect:/login";
-        }
-
-        Participante participante = resultado.get();
-        session.setAttribute("participanteLogado", participante);
-
-        if (Boolean.TRUE.equals(participante.getAdm())) {
-            return "redirect:/admin/dashboard";
-        }
-        return "redirect:/lobby";
     }
 
     @GetMapping("/lobby")
@@ -88,11 +58,5 @@ public class AuthController {
         model.addAttribute("resultados", resultados);
         model.addAttribute("corridasRespondidasIds", corridasRespondidasIds);
         return "lobby";
-    }
-
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/login";
     }
 }

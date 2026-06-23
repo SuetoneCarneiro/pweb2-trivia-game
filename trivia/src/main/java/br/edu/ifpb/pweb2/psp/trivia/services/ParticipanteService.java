@@ -3,7 +3,9 @@ package br.edu.ifpb.pweb2.psp.trivia.services;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
+import java.util.Set;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Participante;
+import br.edu.ifpb.pweb2.psp.trivia.entities.Perfil;
 import br.edu.ifpb.pweb2.psp.trivia.repositories.ParticipanteRepository;
 
 @Service
@@ -21,7 +23,7 @@ public class ParticipanteService {
         Participante novo = new Participante();
         novo.setNome(nome);
         novo.setEmail(nome.toLowerCase().replace(" ", "") + "@trivia.com");
-        novo.setAdm(false);
+        novo.setPerfis(Set.of(Perfil.PARTICIPANTE));
         return participanteRepository.save(novo);
     }
 
@@ -38,6 +40,6 @@ public class ParticipanteService {
     }
 
     public boolean isAdmin(Participante participante) {
-        return participante != null && Boolean.TRUE.equals(participante.getAdm());
+        return participante != null && participante.isAdmin();
     }
 }
