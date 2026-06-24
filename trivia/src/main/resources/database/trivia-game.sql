@@ -16,6 +16,7 @@ ativo      boolean
 CREATE TABLE Pergunta(
 id          serial PRIMARY KEY,
 enunciado   text,
+url_imagem  varchar(500),
 resposta    integer,
 id_corrida  integer   
 );

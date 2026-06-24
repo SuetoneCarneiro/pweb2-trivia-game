@@ -29,6 +29,9 @@ public class Pergunta {
     @Column(name = "enunciado")
     private String enunciado;
 
+    @Column(name = "url_imagem", length = 500)
+    private String urlImagem;
+
     //(pedroA) alterei o tipo para Integer para armazenar o índice da alternativa correta
     @Column(name = "resposta")
     private Integer resposta;
