@@ -32,7 +32,7 @@ public class AdminController {
 
     private boolean isAdmin(HttpSession session) {
         Participante p = (Participante) session.getAttribute("participanteLogado");
-        return p != null && Boolean.TRUE.equals(p.getAdm());
+        return p != null && p.isAdmin();
     }
 
     // Dashboard principal
