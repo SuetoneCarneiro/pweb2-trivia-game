@@ -2,6 +2,7 @@ package br.edu.ifpb.pweb2.psp.trivia.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -13,6 +14,7 @@ import br.edu.ifpb.pweb2.psp.trivia.security.LoginSuccessHandler;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // para o requisito de ter autorização via anotação
 public class SecurityConfig {
 
     private final LoginSuccessHandler loginSuccessHandler;
@@ -30,8 +32,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .authorizeHttpRequests(auth -> auth
+                // o do admin vai ficar por anotação
                 .requestMatchers("/login", "/error", "/error/**", "/static/**").permitAll()
-                .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
