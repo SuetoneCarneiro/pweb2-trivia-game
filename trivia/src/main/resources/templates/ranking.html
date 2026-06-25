@@ -7,12 +7,11 @@
     <header th:replace="~{fragments/layout :: header-user(~{:: #ranking-nav})}">
         <th:block id="ranking-nav">
             <a th:href="@{/lobby}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Lobby</a>
-            <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/dashboard}" class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">Admin</a>
         </th:block>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
-        <!-- cabeçalho do ranking, filtro, seletor de tamanho (já implementado) -->
+        <!-- Cabeçalho com filtro e seletor de tamanho -->
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
                 <h2 class="text-3xl font-extrabold text-gray-800"
@@ -52,7 +51,7 @@
             </div>
         </div>
 
-        <!-- Tabela de ranking (já corrigida) -->
+        <!-- Tabela de ranking -->
         <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
@@ -70,10 +69,16 @@
                             class="hover:bg-indigo-50/50 transition-colors duration-150"
                             th:classappend="${estat.index % 2 == 0} ? 'bg-white' : 'bg-gray-50/50'">
                             <td class="px-6 py-4">
-                                <span th:if="${estat.index == 0}" class="inline-flex items-center justify-center w-8 h-8 bg-yellow-100 text-yellow-700 font-bold rounded-full text-sm">1</span>
-                                <span th:if="${estat.index == 1}" class="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 font-bold rounded-full text-sm">2</span>
-                                <span th:if="${estat.index == 2}" class="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-700 font-bold rounded-full text-sm">3</span>
-                                <span th:if="${estat.index > 2}" class="text-gray-400 font-medium pl-2" th:text="${estat.index + 1 + (currentPage * pageSize)}">4</span>
+                                <!-- CORREÇÃO: SÓ EXIBE MEDALHAS NA PRIMEIRA PÁGINA -->
+                                <th:block th:if="${currentPage == 0}">
+                                    <span th:if="${estat.index == 0}" class="inline-flex items-center justify-center w-8 h-8 bg-yellow-100 text-yellow-700 font-bold rounded-full text-sm">1</span>
+                                    <span th:if="${estat.index == 1}" class="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 font-bold rounded-full text-sm">2</span>
+                                    <span th:if="${estat.index == 2}" class="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-700 font-bold rounded-full text-sm">3</span>
+                                </th:block>
+                                <!-- PARA OS DEMAIS: exibe número global -->
+                                <th:block th:unless="${currentPage == 0 and estat.index < 3}">
+                                    <span class="text-gray-400 font-medium pl-2" th:text="${estat.index + 1 + (currentPage * pageSize)}">4</span>
+                                </th:block>
                             </td>
                             <td class="px-6 py-4 font-medium text-gray-800" th:text="${resultado.idParticipante.nome}">Nome</td>
                             <td class="px-6 py-4 text-gray-500" th:text="${resultado.idCorrida.titulo}">Corrida</td>
@@ -95,6 +100,7 @@
 
         <!-- Navegação de páginas -->
         <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
+            <!-- Botão Anterior -->
             <a th:if="${currentPage > 0}"
                th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${currentPage - 1}, size=${pageSize})}"
                class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -102,6 +108,7 @@
             </a>
             <span th:unless="${currentPage > 0}" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">Anterior</span>
 
+            <!-- Números das páginas (exibe até 5 páginas ao redor da atual) -->
             <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
                 <a th:if="${i >= currentPage - 2 and i <= currentPage + 2}"
                    th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${i}, size=${pageSize})}"
@@ -111,6 +118,7 @@
                 </a>
             </th:block>
 
+            <!-- Botão Próxima -->
             <a th:if="${currentPage < totalPages - 1}"
                th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${currentPage + 1}, size=${pageSize})}"
                class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
@@ -118,6 +126,7 @@
             </a>
             <span th:unless="${currentPage < totalPages - 1}" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">Próxima</span>
         </div>
+
         <div class="mt-4 text-center text-sm text-gray-400">
             Total de registros: <span th:text="${totalItems}">0</span>
         </div>

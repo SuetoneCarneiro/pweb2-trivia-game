@@ -38,9 +38,7 @@
                 Admin: <span class="font-semibold text-gray-700" sec:authentication="name">Admin</span>
             </span>
             <th:block th:replace="${navLinks}" />
-            <form th:action="@{/logout}" method="post" class="inline">
-                <button type="submit" class="text-sm font-medium text-red-500 hover:text-red-700 transition">Sair</button>
-            </form>
+            
         </div>
     </div>
 </header>
