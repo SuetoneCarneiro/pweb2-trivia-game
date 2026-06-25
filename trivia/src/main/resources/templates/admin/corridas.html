@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Admin - Corridas</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Admin - Corridas')}"></head>
 <body class="bg-gray-50">
 
     <div class="max-w-7xl mx-auto px-4 py-6">
@@ -44,7 +39,7 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
                             <a th:href="@{/admin/corridas/editar/{id}(id=${c.id})}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
                             <a th:href="@{/admin/perguntas/{id}(id=${c.id})}" class="text-blue-600 hover:text-blue-900">Perguntas</a>
-                            <a th:href="@{/admin/corridas/excluir/{id}(id=${c.id})}" onclick="return confirm('Excluir esta corrida?')" class="text-red-600 hover:text-red-900">Excluir</a>
+                            <a th:href="@{/admin/corridas/desativar/{id}(id=${c.id})}" onclick="return confirm('Desativar esta corrida?')" class="text-red-600 hover:text-red-900">Desativar</a>
                         </td>
                     </tr>
                     <tr th:if="${corridas.empty}">

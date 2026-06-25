@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Acesso negado')}"></head>
+<body class="min-h-screen bg-gradient-to-br from-indigo-500 via-purple-500 to-blue-600 flex items-center justify-center p-4">
+
+    <div class="w-full max-w-md">
+        <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-2xl p-8 text-center">
+
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-5">
+                <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+            </div>
+
+            <p class="text-6xl font-extrabold text-red-600 mb-2">403</p>
+            <h1 class="text-2xl font-extrabold text-gray-800 mb-2">Acesso negado</h1>
+            <p class="text-gray-500 mb-8">Você não tem permissão para acessar esta página.</p>
+
+            <a th:href="@{/lobby}"
+               class="block w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl shadow-md hover:shadow-lg transition-all duration-200">
+                Voltar ao início
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,21 +1,13 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Admin Dashboard - Trivia Game</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Admin Dashboard - Trivia Game')}"></head>
 <body class="bg-gray-50">
 
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
-            <div class="flex items-center gap-4">
-                <a href="/admin/dashboard" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Dashboard</a>
-                <a href="/logout" class="text-sm font-medium text-red-500 hover:text-red-700 transition">Sair</a>
-            </div>
-        </div>
+    <header th:replace="~{fragments/layout :: header-admin(~{:: #dashboard-nav})}">
+        <th:block id="dashboard-nav">
+            <a th:href="@{/admin/dashboard}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Dashboard</a>
+            <a th:href="@{/logout}" class="text-sm font-medium text-red-500 hover:text-red-700 transition">Sair</a>
+        </th:block>
     </header>
 
     <main class="max-w-7xl mx-auto px-4 py-8">
@@ -43,7 +35,8 @@
                         <a th:href="@{/admin/perguntas/{id}(id=${c.id})}" class="text-sm bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg hover:bg-indigo-100">Perguntas</a>
                         <a th:href="@{/admin/corridas/editar/{id}(id=${c.id})}" class="text-sm bg-amber-50 text-amber-600 px-3 py-1 rounded-lg hover:bg-amber-100">Editar</a>
                         <a th:href="@{/admin/participantes/{id}(id=${c.id})}" class="text-sm bg-emerald-50 text-emerald-600 px-3 py-1 rounded-lg hover:bg-emerald-100">Participantes</a>
-                        <a th:href="@{/admin/corridas/excluir/{id}(id=${c.id})}" onclick="return confirm('Excluir esta corrida?')" class="text-sm bg-red-50 text-red-600 px-3 py-1 rounded-lg hover:bg-red-100">Excluir</a>
+                        <a th:if="${c.ativo}" th:href="@{/admin/corridas/desativar/{id}(id=${c.id})}" onclick="return confirm('Desativar esta corrida?')" class="text-sm bg-red-50 text-red-600 px-3 py-1 rounded-lg hover:bg-red-100">Desativar</a>
+                        <a th:unless="${c.ativo}" th:href="@{/admin/corridas/reativar/{id}(id=${c.id})}" onclick="return confirm('Reativar esta corrida?')" class="text-sm bg-green-50 text-green-600 px-3 py-1 rounded-lg hover:bg-green-100">Reativar</a>
                     </div>
                 </div>
             </div>

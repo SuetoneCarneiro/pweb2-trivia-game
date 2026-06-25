@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
@@ -12,9 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
 
     private static final Logger log = LoggerFactory.getLogger(WebConfig.class);
-
-    @Autowired
-    private AuthInterceptor authInterceptor;
 
     @Autowired
     private UploadProperties uploadProperties;
@@ -28,12 +24,5 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations(location);
 
         log.info("Arquivos de upload servidos em {} a partir de {}", urlPattern, location);
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(authInterceptor)
-                .addPathPatterns("/**")
-                .excludePathPatterns("/login", "/", "/static/**", "/uploads/**", "/error");
     }
 }

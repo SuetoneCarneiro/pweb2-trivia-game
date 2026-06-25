@@ -34,7 +34,7 @@ public class AdminController {
 
     private boolean isAdmin(HttpSession session) {
         Participante p = (Participante) session.getAttribute("participanteLogado");
-        return p != null && Boolean.TRUE.equals(p.getAdm());
+        return p != null && p.isAdmin();
     }
 
     // Dashboard principal
@@ -81,20 +81,61 @@ public class AdminController {
             ra.addFlashAttribute("mensagem", "Acesso negado.");
             return "redirect:/lobby";
         }
+        boolean novaCorrida = (corrida.getId() == null);
         if (corrida.getAtivo() == null) corrida.setAtivo(false);
         corridaService.salvar(corrida);
-        ra.addFlashAttribute("mensagem", "Corrida salva com sucesso!");
+
+        if (novaCorrida) {
+            ra.addFlashAttribute("mensagem", "Corrida criada com sucesso!");
+            return "redirect:/admin/corridas/" + corrida.getId() + "/confirmar-perguntas";
+        }
+
+        ra.addFlashAttribute("mensagem", "Corrida atualizada com sucesso!");
         return "redirect:/admin/dashboard";
     }
 
-    @GetMapping("/corridas/excluir/{id}")
-    public String excluirCorrida(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+    @GetMapping("/corridas/{id}/confirmar-perguntas")
+    public String confirmarPerguntas(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
         if (!isAdmin(session)) {
             ra.addFlashAttribute("mensagem", "Acesso negado.");
             return "redirect:/lobby";
         }
-        corridaService.excluir(id);
-        ra.addFlashAttribute("mensagem", "Corrida excluída.");
+        Corrida corrida = corridaService.buscarPorId(id);
+        if (corrida == null) {
+            ra.addFlashAttribute("mensagem", "Corrida não encontrada.");
+            return "redirect:/admin/dashboard";
+        }
+        model.addAttribute("corrida", corrida);
+        return "admin/confirmar-perguntas";
+    }
+
+    @GetMapping("/corridas/desativar/{id}")
+    public String desativarCorrida(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        if (!isAdmin(session)) {
+            ra.addFlashAttribute("mensagem", "Acesso negado.");
+            return "redirect:/lobby";
+        }
+        Corrida corrida = corridaService.desativar(id);
+        if (corrida == null) {
+            ra.addFlashAttribute("mensagem", "Corrida não encontrada.");
+            return "redirect:/admin/dashboard";
+        }
+        ra.addFlashAttribute("mensagem", "Corrida desativada.");
+        return "redirect:/admin/dashboard";
+    }
+
+    @GetMapping("/corridas/reativar/{id}")
+    public String reativarCorrida(@PathVariable Long id, HttpSession session, RedirectAttributes ra) {
+        if (!isAdmin(session)) {
+            ra.addFlashAttribute("mensagem", "Acesso negado.");
+            return "redirect:/lobby";
+        }
+        Corrida corrida = corridaService.reativar(id);
+        if (corrida == null) {
+            ra.addFlashAttribute("mensagem", "Corrida não encontrada.");
+            return "redirect:/admin/dashboard";
+        }
+        ra.addFlashAttribute("mensagem", "Corrida reativada.");
         return "redirect:/admin/dashboard";
     }
 

@@ -1,37 +1,36 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Ranking Geral</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Ranking Geral')}"></head>
 <body class="min-h-screen bg-gray-50">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm border-b border-gray-200">
-        <div class="max-w-6xl mx-auto px-4 py-4 flex items-center justify-between">
-            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
-            <div class="flex items-center gap-4">
-                <span class="text-sm text-gray-500">
-                    Olá, <span class="font-semibold text-gray-700" th:text="${session.participanteLogado.nome}">Usuário</span>
-                </span>
-                <a th:href="@{/lobby}"
-                   class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">
-                    Lobby
-                </a>
-                <a th:href="@{/logout}"
-                   class="text-sm font-medium text-red-500 hover:text-red-700 transition">
-                    Sair
-                </a>
-            </div>
-        </div>
+    <header th:replace="~{fragments/layout :: header-user(~{:: #ranking-nav})}">
+        <th:block id="ranking-nav">
+            <a th:href="@{/lobby}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">Lobby</a>
+        </th:block>
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
-        <div class="mb-8">
-            <h2 class="text-3xl font-extrabold text-gray-800">Ranking Geral</h2>
-            <p class="mt-1 text-gray-500">Os melhores resultados de todas as corridas</p>
+        <div class="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-800"
+                    th:text="${corridaSelecionada != null} ? 'Ranking - ' + ${corridaSelecionada.titulo} : 'Ranking Geral'">Ranking Geral</h2>
+                <p class="mt-1 text-gray-500"
+                   th:text="${corridaSelecionada != null} ? 'Resultados da corrida selecionada' : 'Os melhores resultados de todas as corridas'">Os melhores resultados de todas as corridas</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <form method="get" th:action="@{/ranking}" class="flex items-center gap-2">
+                    <select name="corridaId" onchange="if(this.value === '') { window.location.href='/ranking'; } else { this.form.submit(); }"
+                            class="text-sm border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none">
+                        <option value="">Todas as corridas</option>
+                        <option th:each="c : ${corridas}" th:value="${c.id}" th:text="${c.titulo}"
+                                th:selected="${corridaIdFiltro != null and corridaIdFiltro == c.id}">Corrida</option>
+                    </select>
+                </form>
+                <a th:if="${corridaIdFiltro != null}" th:href="@{/ranking}"
+                   class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">
+                    Limpar filtro
+                </a>
+            </div>
         </div>
 
         <div class="bg-white rounded-2xl shadow-md border border-gray-100 overflow-hidden">
