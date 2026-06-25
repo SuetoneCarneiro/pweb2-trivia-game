@@ -1,20 +1,34 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{fragments/layout :: head('Nova Pergunta')}"></head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title th:text="${pergunta.id == null} ? 'Nova Pergunta' : 'Editar Pergunta'">Nova Pergunta</title>
+</head>
 <body class="bg-gray-50">
 
-    <header th:replace="~{fragments/layout :: header-admin(~{:: #pergunta-form-nav})}">
-        <th:block id="pergunta-form-nav">
-            <a th:href="@{/admin/perguntas/{id}(id=${corrida.id})}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">&larr; Voltar para perguntas</a>
-        </th:block>
+    <header class="bg-white shadow-sm border-b border-gray-200">
+        <div class="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-indigo-700">Trivia Game</h1>
+            <a th:href="@{/admin/perguntas/{id}(id=${corrida.id})}" class="text-sm font-medium text-gray-600 hover:text-indigo-600 transition">← Voltar para perguntas</a>
+        </div>
     </header>
 
     <div class="max-w-4xl mx-auto px-4 py-8">
         <div class="bg-white rounded-xl shadow-lg p-6">
-            <h1 class="text-2xl font-bold text-gray-800 mb-4">Nova Pergunta</h1>
+            <h1 class="text-2xl font-bold text-gray-800 mb-4" th:text="${pergunta.id == null} ? 'Nova Pergunta' : 'Editar Pergunta'">Nova Pergunta</h1>
             <p class="text-gray-600 mb-6">Corrida: <strong th:text="${corrida.titulo}"></strong></p>
 
-            <form method="post" th:action="@{/admin/perguntas/salvar}" th:object="${pergunta}">
+            <div th:if="${mensagem}"
+                 class="mb-6 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm"
+                 th:text="${mensagem}"></div>
+
+            <form method="post"
+                  enctype="multipart/form-data"
+                  th:action="@{/admin/perguntas/salvar}"
+                  th:object="${pergunta}">
+                <input type="hidden" th:field="*{id}" />
                 <input type="hidden" th:field="*{idCorrida.id}" />
 
                 <div class="mb-4">
@@ -23,14 +37,42 @@
                 </div>
 
                 <div class="mb-4">
+                    <label for="imagem" class="block text-gray-700 font-medium mb-2">Imagem da pergunta (PNG)</label>
+                    <input type="file"
+                           id="imagem"
+                           name="imagem"
+                           accept=".png,image/png"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" />
+                    <p class="text-xs text-gray-400 mt-1">Opcional. Envie apenas arquivos .png (máx. 5 MB).</p>
+                    <div th:if="${pergunta.urlImagem != null and !pergunta.urlImagem.isEmpty()}" class="mt-3">
+                        <p class="text-sm text-gray-600 mb-2">Imagem atual:</p>
+                        <img th:src="${pergunta.urlImagem}" alt="Imagem da pergunta" class="max-h-40 rounded-lg border border-gray-200" />
+                        <p class="text-xs text-gray-400 mt-1">Deixe o campo vazio para manter a imagem atual.</p>
+                    </div>
+                </div>
+
+                <div class="mb-4">
                     <label class="block text-gray-700 font-medium mb-2">Alternativas (separadas por ponto e vírgula ;)</label>
-                    <input type="text" name="alternativasList" id="alternativasList" class="w-full border border-gray-300 rounded-lg px-4 py-2" placeholder="Exemplo: 10;20;30;40;50" required />
+                    <input type="text"
+                           name="alternativasList"
+                           id="alternativasList"
+                           class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                           placeholder="Exemplo: 10;20;30;40;50"
+                           th:value="${pergunta.alternativas != null ? #strings.listJoin(pergunta.alternativas, ';') : ''}"
+                           required />
                     <p class="text-xs text-gray-400 mt-1">Digite as opções separadas por ; (ex: Azul;Verde;Amarelo;Vermelho)</p>
                 </div>
 
                 <div class="mb-6">
                     <label class="block text-gray-700 font-medium mb-2">Índice da resposta correta (0‑based)</label>
-                    <input type="number" name="indiceResposta" id="indiceResposta" min="0" step="1" class="w-32 border border-gray-300 rounded-lg px-4 py-2" required />
+                    <input type="number"
+                           name="indiceResposta"
+                           id="indiceResposta"
+                           min="0"
+                           step="1"
+                           class="w-32 border border-gray-300 rounded-lg px-4 py-2"
+                           th:value="${pergunta.resposta}"
+                           required />
                     <p class="text-xs text-gray-400 mt-1">Exemplo: se a resposta correta for a primeira alternativa, digite 0. Se for a segunda, digite 1, etc.</p>
                 </div>
 

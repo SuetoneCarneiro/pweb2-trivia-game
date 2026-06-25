@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Corrida;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Pergunta;
@@ -14,6 +15,7 @@ import br.edu.ifpb.pweb2.psp.trivia.services.CorridaService;
 import br.edu.ifpb.pweb2.psp.trivia.services.PerguntaService;
 import br.edu.ifpb.pweb2.psp.trivia.services.ResultadoService;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -172,20 +174,54 @@ public class AdminController {
         return "admin/pergunta-form";
     }
 
+    @GetMapping("/perguntas/editar/{id}")
+    public String editarPergunta(@PathVariable Long id, HttpSession session, Model model, RedirectAttributes ra) {
+        if (!isAdmin(session)) {
+            ra.addFlashAttribute("mensagem", "Acesso negado.");
+            return "redirect:/lobby";
+        }
+        Pergunta pergunta = perguntaService.buscarPorId(id);
+        if (pergunta == null || pergunta.getIdCorrida() == null) {
+            ra.addFlashAttribute("mensagem", "Pergunta não encontrada.");
+            return "redirect:/admin/dashboard";
+        }
+        model.addAttribute("pergunta", pergunta);
+        model.addAttribute("corrida", pergunta.getIdCorrida());
+        return "admin/pergunta-form";
+    }
+
     @PostMapping("/perguntas/salvar")
     public String salvarPergunta(@ModelAttribute Pergunta pergunta,
                                  @RequestParam("indiceResposta") int indiceResposta,
                                  @RequestParam("alternativasList") String alternativasRaw,
+                                 @RequestParam(value = "imagem", required = false) MultipartFile imagem,
                                  HttpSession session, RedirectAttributes ra) {
         if (!isAdmin(session)) {
             ra.addFlashAttribute("mensagem", "Acesso negado.");
             return "redirect:/lobby";
         }
-        // processar alternativas (separadas por ;) ajustar depois com a equipe
+        if (pergunta.getId() != null && perguntaService.buscarPorId(pergunta.getId()) == null) {
+            ra.addFlashAttribute("mensagem", "Pergunta não encontrada.");
+            return "redirect:/admin/dashboard";
+        }
         List<String> alternativas = Arrays.asList(alternativasRaw.split("\\s*;\\s*"));
         pergunta.setAlternativas(alternativas);
         pergunta.setResposta(indiceResposta);
-        perguntaService.salvar(pergunta);
+        try {
+            perguntaService.salvar(pergunta, imagem);
+        } catch (IllegalArgumentException e) {
+            ra.addFlashAttribute("mensagem", e.getMessage());
+            if (pergunta.getId() != null) {
+                return "redirect:/admin/perguntas/editar/" + pergunta.getId();
+            }
+            return "redirect:/admin/perguntas/nova/" + pergunta.getIdCorrida().getId();
+        } catch (IOException e) {
+            ra.addFlashAttribute("mensagem", "Erro ao processar a imagem. Tente novamente.");
+            if (pergunta.getId() != null) {
+                return "redirect:/admin/perguntas/editar/" + pergunta.getId();
+            }
+            return "redirect:/admin/perguntas/nova/" + pergunta.getIdCorrida().getId();
+        }
         ra.addFlashAttribute("mensagem", "Pergunta salva com sucesso!");
         return "redirect:/admin/perguntas/" + pergunta.getIdCorrida().getId();
     }
@@ -202,7 +238,12 @@ public class AdminController {
             return "redirect:/admin/dashboard";
         }
         Long idCorrida = p.getIdCorrida().getId();
-        perguntaService.excluir(id);
+        try {
+            perguntaService.excluir(id);
+        } catch (IOException e) {
+            ra.addFlashAttribute("mensagem", "Erro ao excluir a imagem da pergunta.");
+            return "redirect:/admin/perguntas/" + idCorrida;
+        }
         ra.addFlashAttribute("mensagem", "Pergunta excluída.");
         return "redirect:/admin/perguntas/" + idCorrida;
     }
