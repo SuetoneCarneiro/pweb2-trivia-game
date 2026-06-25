@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head th:replace="~{fragments/layout :: head('Ranking Geral')}"></head>
 <body class="min-h-screen bg-gray-50">
 
@@ -10,6 +11,7 @@
     </header>
 
     <main class="max-w-6xl mx-auto px-4 py-8">
+        <!-- Cabeçalho com filtro e seletor de tamanho -->
         <div class="mb-8 flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
             <div>
                 <h2 class="text-3xl font-extrabold text-gray-800"
@@ -28,7 +30,7 @@
                     </select>
                 </form>
 
-                <!-- Seletor de Tamanho de Página -->
+                <!-- Seletor de tamanho de página -->
                 <form method="get" th:action="@{/ranking}" class="flex items-center gap-2">
                     <input type="hidden" name="corridaId" th:value="${corridaIdFiltro}" />
                     <label for="sizeSelect" class="text-sm text-gray-600 font-medium">Itens por página:</label>
@@ -40,10 +42,10 @@
                         <option value="10" th:selected="${pageSize == 10}">10</option>
                         <option value="20" th:selected="${pageSize == 20}">20</option>
                     </select>
-                    <input type="number" name="size" min="1" step="1" 
+                    <input type="number" name="size" min="1" step="1"
                            placeholder="Personalizado"
                            class="w-24 text-sm border border-gray-300 rounded-lg px-2 py-2 bg-white text-gray-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 outline-none"
-                           th:value="${pageSize}" 
+                           th:value="${pageSize}"
                            onchange="this.form.submit()" />
                 </form>
             </div>
@@ -67,6 +69,13 @@
                             class="hover:bg-indigo-50/50 transition-colors duration-150"
                             th:classappend="${estat.index % 2 == 0} ? 'bg-white' : 'bg-gray-50/50'">
                             <td class="px-6 py-4">
+                                <!--
+                                    CÁLCULO DA POSIÇÃO GLOBAL:
+                                    - Os três primeiros colocados (índice 0,1,2) ganham medalhas.
+                                    - Para os demais, calcula-se: índice + 1 + (página atual * tamanho da página)
+                                    Isso porque a página atual é 0-based, e o índice dentro da página também é 0-based.
+                                    Ex: página 1 (currentPage=1), size=5, primeiro da página (índice 0) => 0+1+1*5 = 6, ou seja, 6º colocado global.
+                                -->
                                 <span th:if="${estat.index == 0}" class="inline-flex items-center justify-center w-8 h-8 bg-yellow-100 text-yellow-700 font-bold rounded-full text-sm">1</span>
                                 <span th:if="${estat.index == 1}" class="inline-flex items-center justify-center w-8 h-8 bg-gray-200 text-gray-600 font-bold rounded-full text-sm">2</span>
                                 <span th:if="${estat.index == 2}" class="inline-flex items-center justify-center w-8 h-8 bg-amber-100 text-amber-700 font-bold rounded-full text-sm">3</span>
@@ -90,70 +99,38 @@
             </div>
         </div>
 
-        <!-- Navegação de páginas (Task 2.4) -->
-        <div th:if="${totalPages > 1}" class="mt-6 flex flex-wrap items-center justify-center gap-2">
+        <!-- Navegação de páginas -->
+        <div class="mt-6 flex flex-wrap items-center justify-center gap-2">
             <!-- Botão Anterior -->
-            <a th:if="${currentPage > 0}" 
+            <a th:if="${currentPage > 0}"
                th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${currentPage - 1}, size=${pageSize})}"
-               class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow transition">
+               class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                 Anterior
             </a>
-            <span th:unless="${currentPage > 0}" 
-                  class="px-4 py-2 bg-gray-200 text-gray-400 text-sm font-medium rounded-lg cursor-default">
-                Anterior
-            </span>
+            <span th:unless="${currentPage > 0}" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">Anterior</span>
 
-            <!-- Numeração de páginas -->
-            <div class="flex gap-1">
-                <!-- Página 1 sempre visível -->
-                <a th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=0, size=${pageSize})}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition"
-                   th:classappend="${currentPage == 0} ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'">
-                    1
-                </a>
-
-                <!-- Se houver páginas entre a primeira e a atual, mostrar "..." -->
-                <span th:if="${currentPage > 2}" class="px-2 py-2 text-gray-400">…</span>
-
-                <!-- Páginas próximas à atual (até 2 antes) -->
-                <a th:each="i : ${#numbers.sequence(currentPage - 1, currentPage + 1)}"
-                   th:if="${i > 0 and i < totalPages - 1}" 
+            <!-- Números das páginas (exibe um intervalo de até 5 páginas ao redor da atual) -->
+            <th:block th:each="i : ${#numbers.sequence(0, totalPages - 1)}">
+                <a th:if="${i >= currentPage - 2 and i <= currentPage + 2}"
                    th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${i}, size=${pageSize})}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition"
-                   th:classappend="${i == currentPage} ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                   th:text="${i + 1}">
+                   th:classappend="${i == currentPage} ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'"
+                   class="px-4 py-2 border border-gray-300 rounded-lg transition-colors">
+                   <span th:text="${i + 1}">1</span>
                 </a>
-
-                <!-- Se houver páginas entre a atual e a última, mostrar "..." -->
-                <span th:if="${currentPage < totalPages - 3}" class="px-2 py-2 text-gray-400">…</span>
-
-                <!-- Última página sempre visível (se houver mais de uma página) -->
-                <a th:if="${totalPages > 1}"
-                   th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${totalPages - 1}, size=${pageSize})}"
-                   class="px-3 py-2 rounded-lg text-sm font-medium transition"
-                   th:classappend="${currentPage == totalPages - 1} ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
-                   th:text="${totalPages}">
-                </a>
-            </div>
+            </th:block>
 
             <!-- Botão Próxima -->
-            <a th:if="${currentPage < totalPages - 1}" 
+            <a th:if="${currentPage < totalPages - 1}"
                th:href="@{/ranking(corridaId=${corridaIdFiltro}, page=${currentPage + 1}, size=${pageSize})}"
-               class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-lg shadow transition">
+               class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
                 Próxima
             </a>
-            <span th:unless="${currentPage < totalPages - 1}" 
-                  class="px-4 py-2 bg-gray-200 text-gray-400 text-sm font-medium rounded-lg cursor-default">
-                Próxima
-            </span>
+            <span th:unless="${currentPage < totalPages - 1}" class="px-4 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-400 cursor-not-allowed">Próxima</span>
         </div>
 
-        <!--  exibindo total de itens -->
-        <div th:if="${totalPages > 0}" class="mt-4 text-center text-sm text-gray-400">
-            Mostrando página <span th:text="${currentPage + 1}"></span> de <span th:text="${totalPages}"></span> 
-            (total de <span th:text="${totalItems}"></span> resultados)
+        <div class="mt-4 text-center text-sm text-gray-400">
+            Total de registros: <span th:text="${totalItems}">0</span>
         </div>
-
     </main>
 </body>
 </html>

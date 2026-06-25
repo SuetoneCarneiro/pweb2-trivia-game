@@ -1,6 +1,5 @@
 package br.edu.ifpb.pweb2.psp.trivia.services;
 
-import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -9,13 +8,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import br.edu.ifpb.pweb2.psp.trivia.entities.Resultado;
 import br.edu.ifpb.pweb2.psp.trivia.repositories.ResultadoRepository;
+import java.util.List;
 
 @Service
 public class ResultadoService {
+
     @Autowired
     private ResultadoRepository resultadoRepository;
 
-    
+    // ------------------- Métodos existentes (não paginados) -------------------
     public Resultado salvar(Resultado resultado) {
         return resultadoRepository.save(resultado);
     }
@@ -24,6 +25,11 @@ public class ResultadoService {
         return resultadoRepository.findAll();
     }
 
+    public List<Resultado> listarPorParticipante(Long idParticipante) {
+        return resultadoRepository.findByIdParticipanteId(idParticipante);
+    }
+
+    // Métodos legados (sem paginação) – podem ser mantidos para outras funcionalidades
     public List<Resultado> listarRankingGeral() {
         return resultadoRepository.findAll().stream()
                 .sorted((r1, r2) -> r2.getPontuacao().compareTo(r1.getPontuacao()))
@@ -37,18 +43,19 @@ public class ResultadoService {
                 .toList();
     }
 
-    public List<Resultado> listarPorParticipante(Long idParticipante) {
-        return resultadoRepository.findByIdParticipanteId(idParticipante);
-    }
-
-    //MÉTODOS PARA PAGINAÇÃOp
     public Page<Resultado> listarRankingGeralPaginado(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("pontuacao").descending());
+        
+        Sort sort = Sort.by("pontuacao").descending()
+                       .and(Sort.by("dataHora").descending());
+        Pageable pageable = PageRequest.of(page, size, sort);
         return resultadoRepository.findAll(pageable);
     }
 
     public Page<Resultado> listarRankingPorCorridaPaginado(Long corridaId, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("pontuacao").descending());
+        Sort sort = Sort.by("pontuacao").descending()
+                       .and(Sort.by("dataHora").descending());
+        Pageable pageable = PageRequest.of(page, size, sort);
+    
         return resultadoRepository.findByIdCorridaId(corridaId, pageable);
     }
 }
