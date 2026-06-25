@@ -1,7 +1,6 @@
 package br.edu.ifpb.pweb2.psp.trivia.services;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -40,7 +39,8 @@ public class ImagemUploadService {
     }
 
     public String salvarPng(MultipartFile arquivo) throws IOException {
-        validarPng(arquivo);
+        // Leitura do conteúdo feita uma única vez. Valida/grava a partir dos mesmos bytes
+        byte[] conteudo = lerEValidarPng(arquivo);
 
         String nomeArquivo = UUID.randomUUID() + ".png";
         Path destino = uploadProperties.getResolvedDir().resolve(nomeArquivo).normalize();
@@ -49,9 +49,7 @@ public class ImagemUploadService {
             throw new IllegalArgumentException("Nome de arquivo inválido.");
         }
 
-        try (InputStream input = arquivo.getInputStream()) {
-            Files.copy(input, destino);
-        }
+        Files.write(destino, conteudo);
 
         return uploadProperties.getNormalizedUrlPrefix() + nomeArquivo;
     }
@@ -79,14 +77,9 @@ public class ImagemUploadService {
         Files.deleteIfExists(arquivo);
     }
 
-    private void validarPng(MultipartFile arquivo) throws IOException {
+    private byte[] lerEValidarPng(MultipartFile arquivo) throws IOException {
         if (arquivo == null || arquivo.isEmpty()) {
             throw new IllegalArgumentException("Selecione um arquivo PNG.");
-        }
-
-        String contentType = arquivo.getContentType();
-        if (contentType == null || !contentType.equalsIgnoreCase("image/png")) {
-            throw new IllegalArgumentException("Apenas arquivos PNG são permitidos.");
         }
 
         String nomeOriginal = arquivo.getOriginalFilename();
@@ -94,9 +87,13 @@ public class ImagemUploadService {
             throw new IllegalArgumentException("A extensão do arquivo deve ser .png.");
         }
 
-        byte[] header = arquivo.getInputStream().readNBytes(PNG_SIGNATURE.length);
-        if (!Arrays.equals(header, PNG_SIGNATURE)) {
+        // A validação real é feita pela assinatura (magic bytes) do PNG
+        byte[] conteudo = arquivo.getBytes();
+        if (conteudo.length < PNG_SIGNATURE.length
+                || !Arrays.equals(Arrays.copyOf(conteudo, PNG_SIGNATURE.length), PNG_SIGNATURE)) {
             throw new IllegalArgumentException("O arquivo enviado não é um PNG válido.");
         }
+
+        return conteudo;
     }
 }
